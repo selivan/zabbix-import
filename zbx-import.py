@@ -51,20 +51,24 @@ if 'result' in auth_result:
         # Read template file content
         with open(args.template_file, 'r', encoding='utf-8') as f:
             source = f.read()
-
-        params = {'format': 'xml',
-                  'rules': { 'groups': {'createMissing': True},
-                            'templates': {'createMissing': True, 'updateExisting': True},
-                            'templateLinkage': {'createMissing': True},
-                            'applications': {'createMissing': True},
-                            'items': {'createMissing': True, 'updateExisting': True},
-                            'discoveryRules': {'createMissing': True, 'updateExisting': True},
-                            'triggers': {'createMissing': True, 'updateExisting': True},
-                            'graphs': {'createMissing': True, 'updateExisting': True},
-                            'valueMaps': {'createMissing': True}
-                            },
-                  'source': source
-                  }
+            params = {'format': 'xml',
+                      'rules': {'groups': {'createMissing': True},
+                                'hosts': {'createMissing': True, 'updateExisting': True},
+                                'items': {'createMissing': True, 'updateExisting': True},
+                                'applications': {'createMissing': True},
+                                'templates': {'createMissing': True, 'updateExisting': True},
+                                'templateLinkage': {'createMissing': True},
+                                'templateScreens': {'createMissing': True, 'updateExisting': True},
+                                'discoveryRules': {'createMissing': True, 'updateExisting': True},
+                                'triggers': {'createMissing': True, 'updateExisting': True},
+                                'graphs': {'createMissing': True, 'updateExisting': True},
+                                'valueMaps': {'createMissing': True},
+                                'images': {'createMissing': True, 'updateExisting': True},
+                                'maps': {'createMissing': True, 'updateExisting': True},
+                                'screens': {'createMissing': True, 'updateExisting': True}
+                                },
+                      'source': source
+                      }
 
         # https://www.zabbix.com/documentation/3.4/manual/api/reference/configuration/import
         import_result = zbxrequest(args.url, method="configuration.import", auth=auth, params=params)

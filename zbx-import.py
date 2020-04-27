@@ -25,6 +25,15 @@ def zbxrequest(url, method, auth, params):
     resp = json.loads(resp, encoding='utf-8')
     return resp
 
+def str2bool(v):
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Import XML configuration files using Zabbix API')
@@ -33,10 +42,19 @@ parser.add_argument('-u', '--user', required=True, help='user name')
 parser.add_argument('-p', '--password', '--pass', required=True, help='password', metavar='PASSWORD')
 parser.add_argument('-s', '--url', default='http://127.0.0.1:80/api_jsonrpc.php',
                     help='Zabbix API URL, default is http://127.0.0.1:80/api_jsonrpc.php')
+parser.add_argument('--create-new', type=str2bool, default=True,
+                    help='Add new elements using data from the import file. Default: yes. See https://www.zabbix.com/documentation/3.4/manual/xml_export_import/templates#importing')
+parser.add_argument('--update-existing', type=str2bool, default=True,
+                    help='Existing elements will be updated with data taken from the import file. Default: yes. See the link above')
+parser.add_argument('--delete-missing', type=str2bool, default=False,
+                    help='Remove existing elements not present in the import file. Default: no. See the link above')
 args = parser.parse_args()
 
-try:
+print(args)
+sys.exit(0)
 
+try:
+    exit_code=1
     # TODO: add API version check
     # r=zbxrequest(args.url, method="apiinfo.version", auth=None, params={})
     # print(r)
@@ -57,21 +75,73 @@ try:
         source = f.read()
 
     # Set import parameters, including template file content
+    # https://www.zabbix.com/documentation/3.4/manual/api/reference/configuration/import
     params = {'format': 'xml',
-              'rules': {'groups': {'createMissing': True},
-                        'hosts': {'createMissing': True, 'updateExisting': True},
-                        'items': {'createMissing': True, 'updateExisting': True},
-                        'applications': {'createMissing': True},
-                        'templates': {'createMissing': True, 'updateExisting': True},
-                        'templateLinkage': {'createMissing': True},
-                        'templateScreens': {'createMissing': True, 'updateExisting': True},
-                        'discoveryRules': {'createMissing': True, 'updateExisting': True},
-                        'triggers': {'createMissing': True, 'updateExisting': True},
-                        'graphs': {'createMissing': True, 'updateExisting': True},
-                        'valueMaps': {'createMissing': True},
-                        'images': {'createMissing': True, 'updateExisting': True},
-                        'maps': {'createMissing': True, 'updateExisting': True},
-                        'screens': {'createMissing': True, 'updateExisting': True}
+              'rules': {
+                        'applications': {
+                            'createMissing': args.create_missing,
+                            'deleteMissing': args.delete_missing
+                            },
+                        'discoveryRules': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing,
+                            'deleteMissing': args.delete_missing
+                            },
+                        'graphs': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing,
+                            'deleteMissing': args.delete_missing
+                            },
+                        'groups': {
+                            'createMissing': args.create_missing
+                            },
+                        'hosts': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing
+                            },
+                        'httptests': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing,
+                            'deleteMissing': args.delete_missing
+                            },
+                        'images': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing
+                            },
+                        'items': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing,
+                            'deleteMissing': args.delete_missing
+                            },
+                        'maps': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing
+                            },
+                        'screens': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing
+                            },
+                        'templateLinkage': {
+                            'createMissing': args.create_missing
+                            },
+                        'templates': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing
+                            },
+                        'templateScreens': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing,
+                            'deleteMissing': args.delete_missing
+                            },
+                        'triggers': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing,
+                            'deleteMissing': args.delete_missing
+                            },
+                        'valueMaps': {
+                            'createMissing': args.create_missing,
+                            'updateExisting': args.update_existing
+                            },
                         },
               'source': source
               }
@@ -90,7 +160,6 @@ try:
 except Exception as e:
 
     print(str(e), file=sys.stderr)
-    exit_code=1
 
 finally:
     # Logout to prevent generation of unnecessary open sessions

@@ -50,9 +50,6 @@ parser.add_argument('--delete-missing', type=str2bool, default=False,
                     help='Remove existing elements not present in the import file. Default: no. See the link above')
 args = parser.parse_args()
 
-print(args)
-sys.exit(0)
-
 try:
     exit_code=1
     # TODO: add API version check

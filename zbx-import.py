@@ -26,15 +26,16 @@ def zbxrequest(url, method, auth, params):
     return resp
 
 
+# Parse command line arguments
+parser = argparse.ArgumentParser(description='Import XML configuration files using Zabbix API')
+parser.add_argument('template_file')
+parser.add_argument('-u', '--user', required=True, help='user name')
+parser.add_argument('-p', '--password', '--pass', required=True, help='password', metavar='PASSWORD')
+parser.add_argument('-s', '--url', default='http://127.0.0.1:80/api_jsonrpc.php',
+                    help='Zabbix API URL, default is http://127.0.0.1:80/api_jsonrpc.php')
+args = parser.parse_args()
+
 try:
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Import XML configuration files using Zabbix API')
-    parser.add_argument('template_file')
-    parser.add_argument('-u', '--user', required=True, help='user name')
-    parser.add_argument('-p', '--password', '--pass', required=True, help='password', metavar='PASSWORD')
-    parser.add_argument('-s', '--url', default='http://127.0.0.1:80/api_jsonrpc.php',
-                        help='Zabbix API URL, default is http://127.0.0.1:80/api_jsonrpc.php')
-    args = parser.parse_args()
 
     # TODO: add API version check
     # r=zbxrequest(args.url, method="apiinfo.version", auth=None, params={})

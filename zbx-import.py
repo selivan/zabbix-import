@@ -27,6 +27,8 @@ def zbxrequest(url, method, auth, params):
 
 
 try:
+    exit_code = 0
+
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='Import XML configuration files using Zabbix API')
     parser.add_argument('template_file')
@@ -84,7 +86,6 @@ try:
     else:
         raise Exception('ERROR: configuration import failed\n' + pformat(import_result))
 
-    exit_code = 0
 
 except Exception as e:
 

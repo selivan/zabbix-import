@@ -2,6 +2,8 @@ Utility to import exported XML configuration(templates, hosts, host groups) into
 
 Tested with Zabix 3.4 and 4.0, probably will work with older versions up to 2.0. Written in pure python 3, no additional libraries are required.
 
+Note the `--delete-missing` option: without it importing existing template with updated triggers will create new triggers, but old ones with the same name and different value will remain.
+
 ```
 $ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php zbx_export_templates.xml
 SUCCESS: configuration import
@@ -38,3 +40,6 @@ optional arguments:
                         Remove existing elements not present in the import
                         file. Default: no. See the link above
 ```
+
+
+**P.S.** If this code is useful for you - don't forget to put a star on it's [github repo](https://github.com/selivan/zabbix-import).

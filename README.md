@@ -13,7 +13,7 @@ Allows to control import options:
 * update existing - update existing elements from the import file. Default: True
 * delete missing - remove existing elements not present in the import file. Default: False. *NOTE*: without this option importing existing template with changed triggers will create new triggers, but old ones with the same name and different value will remain.
 
-You can set this options for all elements or precisely selects elements for the option: `--delete-missing 'triggers graphs'`. Check `--help` for available elements.
+You can set this options for all elements or precisely select list of elements for the option: `--delete-missing 'triggers graphs'`. Check `--help` for available elements.
 
 ```
 $ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php --delete-missing zbx_export_templates.xml

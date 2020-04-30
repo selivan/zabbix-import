@@ -1,5 +1,10 @@
 Utility to import exported XML configuration(templates, hosts, ...) into Zabbix using it's [API](https://www.zabbix.com/documentation/3.4/manual/api).
 
+```
+$ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php zbx_export_templates.xml
+SUCCESS: configuration import
+```
+
 Tested with Zabix 3.4 and 4.0, probably will work with older versions up to 2.0. Written in pure python 3, no additional libraries are required.
 
 Allows to control import options:
@@ -11,9 +16,6 @@ Allows to control import options:
 You can set this options for all elements or precisely selects elements for the option: `--delete-missing 'triggers graphs'`. Check `--help` for available elements.
 
 ```
-$ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php zbx_export_templates.xml
-SUCCESS: configuration import
-
 $ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php --delete-missing zbx_export_templates.xml
 SUCCESS: configuration import
 ```

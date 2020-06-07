@@ -1,5 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 #-*- coding:utf-8 -*-
+
 """
 Import XML configuration files using Zabbix API.
 Detailed information about zabbix templates import/export using the
@@ -9,11 +10,15 @@ available at:
     https://www.zabbix.com/documentation/3.4/manual/api/reference/configuration/import
 """
 from argparse import ArgumentParser, RawTextHelpFormatter
-from urllib import request
 import json
-import sys
-from pprint import pformat
 import os
+from pprint import pformat
+import sys
+try: #python3
+    from urllib.request import Request, urlopen
+except: #python2
+    from urllib2 import Request, urlopen 
+import traceback
 
 DEFAULT_ZABBIX_API_URL = 'http://127.0.0.1:80/api_jsonrpc.php'
 ELEMENTS_OPTIONS_DICT = {
@@ -139,8 +144,8 @@ def zbxrequest(url, method, auth, params):
     headers = {'Content-Type': 'application/json'}
     # Convert to string and then to byte
     data = json.dumps(data).encode('utf-8')
-    req = request.Request(args.url, headers=headers, data=data)
-    resp = request.urlopen(req)
+    req = Request(args.url, headers=headers, data=data)
+    resp = urlopen(req)
     # Get string
     resp = resp.read().decode('utf-8')
     # Convert to object
@@ -174,8 +179,12 @@ def import_zabbix_template(template_file, user, passwd, url,
     auth_token = auth_result['result']
     
     # Read template file content
-    with open(template_file, 'r', encoding='utf-8') as f:
-        source = f.read()
+    try: #python3
+        with open(template_file, 'r', encoding='utf-8') as f:
+            source = f.read()
+    except: #python2
+        with open(template_file, 'r') as f:
+            source = f.read()
     
     # Set import parameters, including template file content
     params = {'format': 'xml', 'rules': rules, 'source': source}
@@ -193,6 +202,7 @@ def import_zabbix_template(template_file, user, passwd, url,
 
 class ZbxImportError(Exception):
     def __init__(self, message, errors=1):
+        traceback.print_exc()
         super(ZbxImportError, self).__init__(message)
         self.errors = errors
 

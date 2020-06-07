@@ -5,7 +5,7 @@ $ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php zb
 SUCCESS: configuration import
 ```
 
-Tested with Zabix 3.4 and 4.0, probably will work with older versions up to 2.0. Written in pure python 3, no additional libraries are required.
+Tested with Zabbix 3.4 and 4.0, probably will work with older versions up to 2.0. Written in pure python, no additional libraries are required. Works with both python 3 and python 2.
 
 Allows to control import options:
 

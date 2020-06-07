@@ -1,37 +1,39 @@
 #!/usr/bin/env python
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 
 """
 Import XML configuration files using Zabbix API.
 Detailed information about zabbix templates import/export using the
 Zabbix Web-UI and Zabbix API usage for import configurations,
 available at:
-    https://www.zabbix.com/documentation/3.4/manual/xml_export_import/templates#importing
-    https://www.zabbix.com/documentation/3.4/manual/api/reference/configuration/import
+    https://www.zabbix.com/documentation/4.0/manual/xml_export_import/templates#importing
+    https://www.zabbix.com/documentation/4.0/manual/api/reference/configuration/import
 """
 from argparse import ArgumentParser, RawTextHelpFormatter
 import json
 import os
+import io  # for handling file encoding in python2
 from pprint import pformat
 import sys
-try: #python3
+
+try:  # python3
     from urllib.request import Request, urlopen
-except: #python2
-    from urllib2 import Request, urlopen 
+except:  # python2
+    from urllib2 import Request, urlopen
 import traceback
 
 DEFAULT_ZABBIX_API_URL = 'http://127.0.0.1:80/api_jsonrpc.php'
 ELEMENTS_OPTIONS_DICT = {
     'createMissing': ['applications', 'discoveryRules', 'graphs', 'groups',
-                       'hosts', 'httptests', 'images', 'items', 'maps',
-                       'screens', 'templateLinkage', 'templates',
-                       'templateScreens', 'triggers', 'valueMaps'],
+                      'hosts', 'httptests', 'images', 'items', 'maps',
+                      'screens', 'templateLinkage', 'templates',
+                      'templateScreens', 'triggers', 'valueMaps'],
     'updateExisting': ['discoveryRules', 'graphs',
-                        'hosts', 'httptests', 'images', 'items', 'maps',
-                        'screens', 'templates',
-                        'templateScreens', 'triggers', 'valueMaps'],
+                       'hosts', 'httptests', 'images', 'items', 'maps',
+                       'screens', 'templates',
+                       'templateScreens', 'triggers', 'valueMaps'],
     'deleteMissing': ['applications', 'discoveryRules', 'graphs',
-                       'httptests', 'items', 'templateScreens', 'triggers'],
+                      'httptests', 'items', 'templateScreens', 'triggers'],
 }
 
 
@@ -74,9 +76,8 @@ def __create_parser():
              'available element values are:\n\n{}\n\nIf not any value is '
              'provided, all of them will be excluded for the\ncreateMissing '
              'option\n'.format('\n'.join(
-                 [', '.join(cm_list[idx:idx+BRKLN_NUM_EL])
-                  for idx in range(len(cm_list))[::BRKLN_NUM_EL]]
-             ))
+            [', '.join(cm_list[idx:idx + BRKLN_NUM_EL])
+             for idx in range(len(cm_list))[::BRKLN_NUM_EL]]))
     )
     parser.add_argument(
         '--no-update-existing', nargs='*', default=None,
@@ -87,9 +88,9 @@ def __create_parser():
              'available element values are:\n\n{}\n\nIf not any value is '
              'provided, all of them will be excluded for the\nupdateExisting '
              'option\n'.format('\n'.join(
-                 [', '.join(ue_list[idx:idx+BRKLN_NUM_EL])
-                  for idx in range(len(ue_list))[::BRKLN_NUM_EL]]
-             ))
+            [', '.join(ue_list[idx:idx + BRKLN_NUM_EL])
+             for idx in range(len(ue_list))[::BRKLN_NUM_EL]]
+        ))
     )
     parser.add_argument(
         '--delete-missing', nargs='*', default=None,
@@ -100,15 +101,14 @@ def __create_parser():
              'The available element values are:\n\n{}\n\nIf not any value is '
              'provided, all of them will be included for the\ndeleteMissing '
              'option\n'.format('\n'.join(
-                 [', '.join(dm_list[idx:idx+BRKLN_NUM_EL])
-                  for idx in range(len(dm_list))[::BRKLN_NUM_EL]]
-             ))
+            [', '.join(dm_list[idx:idx + BRKLN_NUM_EL])
+             for idx in range(len(dm_list))[::BRKLN_NUM_EL]]
+        ))
     )
     return parser
 
 
 def __build_rules(no_create_missing, no_update_existing, delete_missing):
-
     # https://www.zabbix.com/documentation/3.4/manual/api/reference/configuration/import
     if no_create_missing is None:
         no_create_missing = []
@@ -125,8 +125,8 @@ def __build_rules(no_create_missing, no_update_existing, delete_missing):
     elif not any(delete_missing):
         delete_missing = ELEMENTS_OPTIONS_DICT['deleteMissing']
 
-    rules = {el:{'createMissing': el not in no_create_missing}
-             for el in ELEMENTS_OPTIONS_DICT['createMissing'] }
+    rules = {el: {'createMissing': el not in no_create_missing}
+             for el in ELEMENTS_OPTIONS_DICT['createMissing']}
     for el in ELEMENTS_OPTIONS_DICT['updateExisting']:
         rules[el]['updateExisting'] = el not in no_update_existing
     for el in ELEMENTS_OPTIONS_DICT['deleteMissing']:
@@ -136,7 +136,6 @@ def __build_rules(no_create_missing, no_update_existing, delete_missing):
 
 
 def zbxrequest(url, method, auth, params):
-
     if params is None:
         params = {}
     data = {"jsonrpc": "2.0", "id": 1, "method": method,
@@ -153,23 +152,21 @@ def zbxrequest(url, method, auth, params):
     return resp
 
 
-def import_zabbix_template(template_file, user, passwd, url, 
+def import_zabbix_template(template_file, user, passwd, url,
                            no_create_missing=None,
                            no_update_existing=None, delete_missing=None):
-
     rules = __build_rules(no_create_missing,
                           no_update_existing, delete_missing)
 
-       
     # TODO: add API version check
     # r=zbxrequest(args.url, method="apiinfo.version", auth=None, params={})
     # print(r)
-    
+
     # Get authentication token
     # https://www.zabbix.com/documentation/3.4/manual/api/reference/user/login
     auth_result = zbxrequest(url, method="user.login", auth=None,
                              params={"user": user, "password": passwd})
-    
+
     # If authentication was not OK
     if 'result' not in auth_result:
         raise ZbxImportError('auth failed\n{}'
@@ -177,22 +174,18 @@ def import_zabbix_template(template_file, user, passwd, url,
 
     global auth_token
     auth_token = auth_result['result']
-    
+
     # Read template file content
-    try: #python3
-        with open(template_file, 'r', encoding='utf-8') as f:
-            source = f.read()
-    except: #python2
-        with open(template_file, 'r') as f:
-            source = f.read()
-    
+    with io.open(template_file, 'r', encoding='utf-8') as f:
+        source = f.read()
+
     # Set import parameters, including template file content
     params = {'format': 'xml', 'rules': rules, 'source': source}
-    
+
     import_result = zbxrequest(url, method="configuration.import",
                                auth=auth_token, params=params)
     # Something like: {'id': 1, 'jsonrpc': '2.0', 'result': True}
-    
+
     if 'result' in import_result and import_result['result']:
         print('SUCCESS: configuration import')
     else:
@@ -221,24 +214,24 @@ if __name__ == '__main__':
         except KeyError as err:
             raise ZbxImportError('Missing zabbix API user name.\n{}'
                                  ''.format(parser.__dict__[
-                                     '_option_string_actions'
-                                 ]['--user'].help))
+                                               '_option_string_actions'
+                                           ]['--user'].help))
     if args.passwd is None:
         try:
             args.passwd = os.environ['ZABBIX_API_PASSWD']
         except KeyError as err:
             raise ZbxImportError('Missing zabbix API password.\n{}'
                                  ''.format(parser.__dict__[
-                                     '_option_string_actions'
-                                 ]['--passwd'].help))
+                                               '_option_string_actions'
+                                           ]['--passwd'].help))
     try:
         import_zabbix_template(args.template_file, args.user, args.passwd,
                                args.url, args.no_create_missing,
                                args.no_update_existing, args.delete_missing)
-    
+
     except Exception as e:
         raise ZbxImportError(str(e))
-    
+
     finally:
         # Logout to prevent generation of unnecessary open sessions
         # https://www.zabbix.com/documentation/3.4/manual/api/reference/user/logout

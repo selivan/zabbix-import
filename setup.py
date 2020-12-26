@@ -13,7 +13,7 @@ setup(
     # twine requires author_email if author is set, but I don't like spam so homepage is enough
     author='Pavel Selivanov github.com/selivan',
     author_email='selivan.at.github@gmail-REMOVE-ANTI-SPAM.com',
-    python_requires='>=2.6, >=3.0',
+    python_requires='>=2.5, >=3.0',
     install_requires=[],
     scripts=['zbx-import.py'],
     data_files=[('', ['LICENSE','VERSION','README.md'])],

@@ -1,11 +1,9 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Environments
-.env
-.venv
-
-# PyCharm
+*.py[co]
+# virtual env
+/venv
+# pycharm
 .idea
+# setuptools
+build/
+dist/
+*.egg-info/

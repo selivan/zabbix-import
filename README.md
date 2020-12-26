@@ -18,9 +18,24 @@ Allows to control import options:
 You can set this options for all elements or precisely select list of elements for the option: `--delete-missing 'triggers graphs'`. Check `--help` for available elements.
 
 ```
-$ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php --delete-missing zbx_export_templates.xml
+$ zbx-import.py -u Admin -p *** --url https://zabbix.local/api_jsonrpc.php --delete-missing exported_templates.xml
 SUCCESS: configuration import
 ```
 
+### Installation
+
+Simplest option - just use `zbx-import.py` directly, it does not have any dependencies.
+
+From [pypi.org](https://pypi.org):
+
+`pip install zabbix-import`
+
+Or create a Docker image and use it:
+
+```bash
+docker build -t zabbix-import .
+# No options to get help on usage
+docker run -it --rm zabbix-import [options]
+```
 
 **P.S.** If this code is useful for you - don't forget to put a star on it's [github repo](https://github.com/selivan/zabbix-import).

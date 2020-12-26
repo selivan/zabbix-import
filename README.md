@@ -1,7 +1,7 @@
 Utility to import exported XML configuration(templates, hosts, ...) into Zabbix using it's [API](https://www.zabbix.com/documentation/3.4/manual/api).
 
 ```
-$ zbx-import.py -u Admin -p ****** --url https://zabbix.local/api_jsonrpc.php zbx_export_templates.xml
+$ zbx-import.py -u Admin -p *** --url https://zabbix.local/api_jsonrpc.php exported_templates.xml
 SUCCESS: configuration import
 ```
 

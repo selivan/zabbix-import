@@ -1,3 +1,5 @@
+[![pypi package](https://img.shields.io/pypi/v/zabbix-import?color=%233fb911&label=pypi%20package)](https://pypi.org/project/zabbix-import/)
+
 Utility to import exported XML configuration(templates, hosts, ...) into Zabbix using it's [API](https://www.zabbix.com/documentation/3.4/manual/api).
 
 ```

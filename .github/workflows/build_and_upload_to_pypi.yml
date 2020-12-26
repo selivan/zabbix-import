@@ -1,0 +1,44 @@
+name: build and upload to pypi if VERSION changed
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build_and_upload:
+    runs-on: ubuntu-latest
+#    strategy:
+#      matrix:
+#        python-version: [3.8]
+    steps:
+      - id: file_changes
+        uses: trilom/file-changes-action@v1.2.3
+        with:
+          output: 'json'
+      - uses: actions/checkout@v2
+        if:
+          contains(steps.file_changes.outputs.files_modified, 'VERSION')
+      - uses: actions/setup-python@v2
+        if:
+          contains(steps.file_changes.outputs.files_modified, 'VERSION')
+        with:
+          python-version: 3.8
+      - name: Create a source package and upload it to pypi
+        if:
+          contains(steps.file_changes.outputs.files_modified, 'VERSION')
+        run: |
+          pip install --upgrade setuptools wheel twine
+          python setup.py sdist
+          python setup.py bdist_wheel
+          python -m twine upload -u "__token__" -p "${{ secrets.pypi_token }}" dist/*
+        # Possible actions to use instead of manual
+#      - name: Publish a source package to PyPI
+#        if:
+#          contains(steps.file_changes.outputs.files_modified, 'VERSION')
+#        uses: pypa/gh-action-pypi-publish@master
+#        uses: ortega2247/pypi-upload-action@master
+#        with:
+#          user: __token__
+#          password: ${{ secrets.pypi_token }}
